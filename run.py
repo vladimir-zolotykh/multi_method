@@ -39,5 +39,5 @@ def add(x: str, y: str):  # noqa: F811
 
 
 if __name__ == "__main__":
-    print(mm.add(2, 5))
-    print(mm.add("hello", "world"))
+    print(mm(2, 5))
+    print(mm("hello", "world"))
