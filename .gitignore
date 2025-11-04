@@ -1,0 +1,3 @@
+.emacs.desktop*
+example1.py
+__pycache__/
