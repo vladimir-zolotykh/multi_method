@@ -1,28 +1,29 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
-class IterMeta(type):
-    def __init__(cls, name, bases, namespace):
-        super().__init__(name, bases, namespace)
-        # Collect all callables that look like methods
-        methods = {
-            k: v for k, v in namespace.items() if callable(v) and not k.startswith("__")
-        }
+class MultiDict(dict):
+    def __setitem__(self, key, value):
+        print(f"{key = }")
+        super().__setitem__(key, value)
 
-        # Call the register() function if it exists
-        if hasattr(cls, "register") and callable(cls.register):
-            cls.register(methods)
-        else:
-            raise TypeError(f"{name} must define a 'register' classmethod")
+
+class IterMeta(type):
+    registry = []
+
+    def __new__(cls, name, bases, namespace):
+        IterMeta.registry = [
+            (k, v)
+            for k, v in namespace.items()
+            if callable(v) and not k.startswith("__")
+        ]
+        return super().__new__(cls, name, bases, namespace)
+
+    @classmethod
+    def __prepare__(cls, clsname, bases):
+        return MultiDict()
 
 
 class _methods(metaclass=IterMeta):
-    @classmethod
-    def register(cls, methods):
-        print(f"Registering {len(methods)} methods for {cls.__name__}:")
-        for name, fn in methods.items():
-            print(f"  {name} -> {fn}")
-
     def add(x: int, y: int):
         return x + y
 
@@ -31,3 +32,14 @@ class _methods(metaclass=IterMeta):
 
     def sub(x: int, y: int):
         return x - y
+
+
+# # prints:
+# key = '__module__'
+# key = '__qualname__'
+# key = 'add'
+# key = 'add'
+# key = 'sub'
+#
+if __name__ == "__main__":
+    print(IterMeta.registry)
