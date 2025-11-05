@@ -25,19 +25,26 @@ class MultiMethod:
         return method(*args)
 
 
-mm = MultiMethod()
+class MultiDispatch:
+    add = MultiMethod()
+    sub = MultiMethod()
 
+    def __init__(self):
+        @self.add.register
+        def add(x: int, y: int):
+            return x + y
 
-@mm.register
-def add(x: int, y: int):  # noqa: F811
-    return x + y
+        @self.add.register
+        def add(x: str, y: str):  # noqa: F811
+            return x + y
 
-
-@mm.register
-def add(x: str, y: str):  # noqa: F811
-    return x + y
+        @self.sub.register
+        def sub(x: int, y: int):
+            return x - y
 
 
 if __name__ == "__main__":
-    print(mm(2, 5))
-    print(mm("hello", "world"))
+    dispatch = MultiDispatch()
+    print(dispatch.add(2, 5))
+    print(dispatch.add("Hello, ", "World!"))
+    print(dispatch.sub(5, 2))
