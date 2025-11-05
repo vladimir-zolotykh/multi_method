@@ -8,16 +8,6 @@ class MultiDict(dict):
 
 
 class IterMeta(type):
-    registry = []
-
-    def __new__(cls, name, bases, namespace):
-        IterMeta.registry = [
-            (k, v)
-            for k, v in namespace.items()
-            if callable(v) and not k.startswith("__")
-        ]
-        return super().__new__(cls, name, bases, namespace)
-
     @classmethod
     def __prepare__(cls, clsname, bases):
         return MultiDict()
@@ -41,5 +31,3 @@ class _methods(metaclass=IterMeta):
 # key = 'add'
 # key = 'sub'
 #
-if __name__ == "__main__":
-    print(IterMeta.registry)
