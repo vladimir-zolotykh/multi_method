@@ -1,9 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
+from inspect import signature, Parameter
+
+
 class MultiDict(dict):
     def __setitem__(self, key, value):
-        print(f"{key = }")
+        types = []
+        if callable(value):
+            sig = signature(value)
+            for name, a in sig.parameters.items():
+                if a.annotation is Parameter.empty:
+                    raise TypeError(f"parameter {name} shall have annotation")
+                types.append(a.annotation)
+        if types:
+            print(f"{types = }")
         super().__setitem__(key, value)
 
 
