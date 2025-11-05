@@ -17,14 +17,14 @@ class _methods(metaclass=IterMeta):
     def add(x: int, y: int):
         return x + y
 
-    def add(x: str, y: str):
+    def add(x: str, y: str):  # noqa F811
         return x + y
 
     def sub(x: int, y: int):
         return x - y
 
 
-# # prints:
+# prints:
 # key = '__module__'
 # key = '__qualname__'
 # key = 'add'
