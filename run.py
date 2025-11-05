@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
+from types import MethodType
 import inspect
 
 
 class MultiMethod:
-    def __init__(self):
+    def __init__(self, name: str):
+        self.__name = name
         self.methods = {}
+
+    def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
+        return MethodType(self, instance)
 
     def register(self, method):
         sig = inspect.signature(method)
@@ -18,15 +25,16 @@ class MultiMethod:
         self.methods[tuple(types)] = method
 
     def __call__(self, *args):
-        types = [type(arg) for arg in args]
+        types = [type(arg) for arg in args[1:]]
         method = self.methods.get(tuple(types), None)
         if method is None:
             raise TypeError(f"No method for {types}")
-        return method(*args)
+        return method(*args[1:])
 
 
 class MultiDispatch:
-    add = MultiMethod()
+    add = MultiMethod("add")
+    sub = MultiMethod("sub")
 
     def __init__(self):
         @self.add.register
@@ -37,19 +45,13 @@ class MultiDispatch:
         def add(x: str, y: str):  # noqa: F811
             return x + y
 
-
-def add_method(meth_name: str) -> None:
-    mm = MultiMethod()
-    setattr(MultiDispatch, "sub", mm)
-
-    @mm.register
-    def sub(x: int, y: int):
-        return x - y
+        @self.sub.register
+        def sub(x: int, y: int):
+            return x - y
 
 
 if __name__ == "__main__":
     dispatch = MultiDispatch()
     print(dispatch.add(2, 5))
     print(dispatch.add("Hello, ", "World!"))
-    add_method("sub")
     print(dispatch.sub(5, 2))
