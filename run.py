@@ -27,7 +27,6 @@ class MultiMethod:
 
 class MultiDispatch:
     add = MultiMethod()
-    sub = MultiMethod()
 
     def __init__(self):
         @self.add.register
@@ -38,13 +37,19 @@ class MultiDispatch:
         def add(x: str, y: str):  # noqa: F811
             return x + y
 
-        @self.sub.register
-        def sub(x: int, y: int):
-            return x - y
+
+def add_method(meth_name: str) -> None:
+    mm = MultiMethod()
+    setattr(MultiDispatch, "sub", mm)
+
+    @mm.register
+    def sub(x: int, y: int):
+        return x - y
 
 
 if __name__ == "__main__":
     dispatch = MultiDispatch()
     print(dispatch.add(2, 5))
     print(dispatch.add("Hello, ", "World!"))
+    add_method("sub")
     print(dispatch.sub(5, 2))
