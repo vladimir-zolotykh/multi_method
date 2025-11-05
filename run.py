@@ -32,6 +32,29 @@ class MultiMethod:
         return method(*args[1:])
 
 
+class _methods:
+    def add(x: int, y: int):
+        return x + y
+
+    def add(x: str, y: str):  # noqa: F811
+        return x + y
+
+    def sub(x: int, y: int):
+        return x - y
+
+
+class MultiDict(dict):
+    def __setitem__(self, key, value):
+        print(f"{key = }")
+        super().__setitem__(key, value)
+
+
+class IterMeta(type):
+    @classmethod
+    def __prepare__(cls, clsname, bases):
+        return MultiDict()
+
+
 class MultiDispatch:
     add = MultiMethod("add")
     sub = MultiMethod("sub")

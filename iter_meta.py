@@ -6,6 +6,7 @@ from inspect import signature, Parameter
 
 class MultiDict(dict):
     def __setitem__(self, key, value):
+        methods = {}
         types = []
         if callable(value):
             sig = signature(value)
@@ -14,7 +15,8 @@ class MultiDict(dict):
                     raise TypeError(f"parameter {name} shall have annotation")
                 types.append(a.annotation)
         if types:
-            print(f"{types = }")
+            methods[tuple(types)] = value
+            print(f"{methods = }")
         super().__setitem__(key, value)
 
 
