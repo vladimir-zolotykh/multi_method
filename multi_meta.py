@@ -19,12 +19,12 @@ class MultiMethod:
     def register(self, method):
         sig = signature(method)
         types = []
-        for name, annotation in sig.parameters.items():
+        for name, param in sig.parameters.items():
             if name == "self":
                 continue
-            if annotation is Parameter.empty:
+            if param.annotation is Parameter.empty:
                 raise TypeError(f"{name} must have annotation")
-            types.append(annotation)
+            types.append(param.annotation)
             self._methods[tuple(types)] = method
 
     def __call__(self, *args):
@@ -37,26 +37,34 @@ class MultiMethod:
 
 class MultiDict(dict):
     def __setitem__(self, key, value):
-        mm: MultiMethod
+        if key.startswith("__"):
+            return super().__setitem__(key, value)
         if key in self:
             mm = self[key]
-            mm.register(value)
+            if isinstance(mm, MultiMethod):
+                mm.register(value)
+            else:
+                mm = MultiMethod(key)
+                mm.register(value)
         else:
             mm = MultiMethod(key)
         super().__setitem__(key, mm)
 
 
 class MultiMeta(type):
+    def __new__(cls, clsname, bases, clsdict):
+        return super().__new__(cls, clsname, bases, dict(clsdict))
+
     @classmethod
     def __prepare__(cls, clsname, bases):
         return MultiDict()
 
 
 class Dispatch(metaclass=MultiMeta):
-    def add(x: int, y: int) -> int:
+    def add(self, x: int, y: int) -> int:
         return x + y
 
-    def add(x: str, y: str) -> str:  # noqa F811
+    def add(self, x: str, y: str) -> str:  # noqa F811
         return x + y
 
 
