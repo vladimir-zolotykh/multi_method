@@ -49,7 +49,6 @@ class MultiDict(dict):
         else:
             mm = MultiMethod(key)
             mm.register(value)
-        print(f"{key = }, {mm = }")
         super().__setitem__(key, mm)
 
 
