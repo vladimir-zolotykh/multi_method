@@ -5,6 +5,7 @@ from types import MethodType
 from typing import Callable, Any
 from inspect import signature, Parameter
 import unittest
+import time
 
 
 class MultiMethod:
@@ -78,6 +79,17 @@ class Dispatch(metaclass=MultiMeta):
         return x * factor
 
 
+class Date(metaclass=MultiMeta):
+    def __init__(self, year: int, month: int, day: int):
+        self.year = year
+        self.month = month
+        self.day = day
+
+    def __init__(self):  # noqa F811
+        t = time.localtime()
+        self.__init__(t.tm_year, t.tm_mon, t.tm_mday)
+
+
 class TestMultiMethod(unittest.TestCase):
     def setUp(self):
         self.d = Dispatch()
@@ -89,6 +101,18 @@ class TestMultiMethod(unittest.TestCase):
     def test_mul(self):
         self.assertEqual(self.d.mul(3.0), 30.0)
         self.assertEqual(self.d.mul(3.0, 2.5), 7.5)
+
+
+class RunBeazleyTests(unittest.TestCase):
+    def test_10_date(self):
+        tup = (2012, 12, 21)
+        d = Date(*tup)
+        self.assertEqual((d.year, d.month, d.day), tup)
+
+    def test_20_date(self):
+        e = Date()
+        t = time.localtime()
+        self.assertEqual((e.year, e.month, e.day), (t.tm_year, t.tm_mon, t.tm_mday))
 
 
 if __name__ == "__main__":
