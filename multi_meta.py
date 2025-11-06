@@ -68,8 +68,12 @@ class Dispatch(metaclass=MultiMeta):
     def add(self, x: str, y: str) -> str:  # noqa F811
         return x + y
 
+    def mul(self, x: float, factor: float = 10.0) -> float:
+        return x * factor
+
 
 if __name__ == "__main__":
     d = Dispatch()
     print(d.add(3, 5))
     print(d.add("Hi, ", "there!"))
+    print(d.mul(3.0))
