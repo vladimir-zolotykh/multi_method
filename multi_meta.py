@@ -41,7 +41,7 @@ class MultiMethod:
 
 class MultiDict(dict):
     def __setitem__(self, key, value):
-        if key.startswith("__"):
+        if key.startswith("__") and not callable(value):
             return super().__setitem__(key, value)
         if key in self:
             mm = self[key]
