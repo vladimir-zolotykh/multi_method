@@ -4,6 +4,7 @@
 from types import MethodType
 from typing import Callable, Any
 from inspect import signature, Parameter
+import unittest
 
 
 class MultiMethod:
@@ -24,8 +25,10 @@ class MultiMethod:
                 continue
             if param.annotation is Parameter.empty:
                 raise TypeError(f"{name} must have annotation")
+            if param.default is not Parameter.empty:
+                self._methods[tuple(types)] = method
             types.append(param.annotation)
-            self._methods[tuple(types)] = method
+        self._methods[tuple(types)] = method
 
     def __call__(self, *args):
         types = [type(arg) for arg in args[1:]]
@@ -75,9 +78,18 @@ class Dispatch(metaclass=MultiMeta):
         return x * factor
 
 
+class TestMultiMethod(unittest.TestCase):
+    def setUp(self):
+        self.d = Dispatch()
+
+    def test_add(self):
+        self.assertEqual(self.d.add(3, 5), 8)
+        self.assertEqual(self.d.add("Hi, ", "there!"), "Hi, there!")
+
+    def test_mul(self):
+        self.assertEqual(self.d.mul(3.0), 30.0)
+        self.assertEqual(self.d.mul(3.0, 2.5), 7.5)
+
+
 if __name__ == "__main__":
-    d = Dispatch()
-    print(d.add(3, 5))
-    print(d.add("Hi, ", "there!"))
-    print(d.mul(3.0))
-    print(d.mul(3.0, 2.5))
+    unittest.main()
