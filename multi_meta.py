@@ -31,7 +31,7 @@ class MultiMethod:
         types = [type(arg) for arg in args[1:]]
         method = self._methods.get(tuple(types), None)
         if not method:
-            raise TypeError(f"No method {self._name} for {types!r}")
+            raise TypeError(f"No method {self._name} for {tuple(types)!r}")
         return method(*args)
 
 
@@ -68,7 +68,10 @@ class Dispatch(metaclass=MultiMeta):
     def add(self, x: str, y: str) -> str:  # noqa F811
         return x + y
 
-    def mul(self, x: float, factor: float = 10.0) -> float:
+    def mul(self, x: float, y: float) -> float:
+        return x * y
+
+    def mul(self, x: float, factor: float = 10.0) -> float:  # noqa F811
         return x * factor
 
 
@@ -77,3 +80,4 @@ if __name__ == "__main__":
     print(d.add(3, 5))
     print(d.add("Hi, ", "there!"))
     print(d.mul(3.0))
+    print(d.mul(3.0, 2.5))
