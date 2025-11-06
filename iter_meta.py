@@ -21,6 +21,9 @@ class MultiDict(dict):
 
 
 class IterMeta(type):
+    def __init__(cls, clsname, bases, clsdict):
+        super().__init__(clsname, bases, clsdict)
+
     @classmethod
     def __prepare__(cls, clsname, bases):
         return MultiDict()
