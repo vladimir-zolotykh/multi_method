@@ -103,7 +103,7 @@ class TestMultiMethod(unittest.TestCase):
         self.assertEqual(self.d.mul(3.0, 2.5), 7.5)
 
 
-class RunBeazleyTests(unittest.TestCase):
+class RunBeazleyTest(unittest.TestCase):
     def test_10_date(self):
         tup = (2012, 12, 21)
         d = Date(*tup)
