@@ -6,6 +6,8 @@ from typing import Callable, Any
 from inspect import signature, Parameter
 import unittest
 import time
+import io
+import contextlib
 
 
 class MultiMethod:
@@ -79,6 +81,14 @@ class Dispatch(metaclass=MultiMeta):
         return x * factor
 
 
+class Spam(metaclass=MultiMeta):
+    def bar(self, x: int, y: int):
+        print("Bar 1: ", x, y)
+
+    def bar(self, s: str, n: int = 0):  # noqa F811
+        print("Bar 2: ", s, n)
+
+
 class Date(metaclass=MultiMeta):
     def __init__(self, year: int, month: int, day: int):
         self.year = year
@@ -104,12 +114,35 @@ class TestMultiMethod(unittest.TestCase):
 
 
 class RunBeazleyTest(unittest.TestCase):
-    def test_10_date(self):
+    def setUp(self):
+        self.spam = Spam()
+
+    def test_10_spam(self):
+        with contextlib.redirect_stdout(io.StringIO()) as f:
+            self.spam.bar(2, 3)
+            self.assertEqual(f.getvalue(), "Bar 1:  2 3\n")
+
+    def test_12_spam(self):
+        with contextlib.redirect_stdout(io.StringIO()) as f:
+            self.spam.bar("hello")
+            self.assertEqual(f.getvalue(), "Bar 2:  hello 0\n")
+
+    def test_14_spam(self):
+        with contextlib.redirect_stdout(io.StringIO()) as f:
+            self.spam.bar("hello", 5)
+            self.assertEqual(f.getvalue(), "Bar 2:  hello 5\n")
+
+    def test_16_spam(self):
+        with contextlib.redirect_stdout(io.StringIO()) as f:
+            self.spam.bar("hello", 5)
+            self.assertEqual(f.getvalue(), "Bar 2:  hello 5\n")
+
+    def test_20_date(self):
         tup = (2012, 12, 21)
         d = Date(*tup)
         self.assertEqual((d.year, d.month, d.day), tup)
 
-    def test_20_date(self):
+    def test_30_date(self):
         e = Date()
         t = time.localtime()
         self.assertEqual((e.year, e.month, e.day), (t.tm_year, t.tm_mon, t.tm_mday))
