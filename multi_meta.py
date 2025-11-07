@@ -137,6 +137,10 @@ class RunBeazleyTest(unittest.TestCase):
             self.spam.bar("hello", 5)
             self.assertEqual(f.getvalue(), "Bar 2:  hello 5\n")
 
+    def test_18_spam(self):
+        with self.assertRaises(TypeError):
+            self.spam.bar(2, "hello")
+
     def test_20_date(self):
         tup = (2012, 12, 21)
         d = Date(*tup)
